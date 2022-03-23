@@ -22,7 +22,7 @@ def findMatchingKeyword(keywords, inputSentence):
                 highestWord = location
 
 
-    return highestWord
+    return highestPercent, highestWord
 
 
 
@@ -40,32 +40,36 @@ def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 
+def speechRecog():
+    model = Model(r'E:\aseniorSemester2\RoboticsCapstone\vosk-model-small-en-us-0.15\vosk-model-small-en-us-0.15')
+    # read the model
 
-model = Model(r'E:\aseniorSemester2\RoboticsCapstone\vosk-model-small-en-us-0.15\vosk-model-small-en-us-0.15')
-# read the model
-
-recognizer = KaldiRecognizer(model, 16000)
-
-
-keywords = ['yes', 'no', 'gates', 'hammerschlag', 'university center', 'home']
-# Recognize from the microphone
-cap = pyaudio.PyAudio()
-stream = cap.open(format=pyaudio.paInt16, channels = 1, rate = 16000, input = True, frames_per_buffer = 8192)
-stream.start_stream()
-
-while True:
-    data = stream.read(4096) # 4 bytes
-    # if len(data) == 0:
-    #     break
-
-    if recognizer.AcceptWaveform(data):
-        input = recognizer.Result()
-        print(input, '\n')
-        matchedWord = findMatchingKeyword(keywords, input)
-        print(matchedWord, '\n')
+    recognizer = KaldiRecognizer(model, 16000)
 
 
+    keywords = ['yes', 'no', 'gates', 'hammerschlag', 'university center', 'home']
+    # Recognize from the microphone
+    cap = pyaudio.PyAudio()
+    stream = cap.open(format=pyaudio.paInt16, channels = 1, rate = 16000, input = True, frames_per_buffer = 8192)
+    stream.start_stream()
 
+    while True:
+        data = stream.read(4096) # 4 bytes
+        # if len(data) == 0:
+        #     break
+
+        if recognizer.AcceptWaveform(data):
+            input = recognizer.Result()
+            print(input, '\n')
+            similarity, matchedWord = findMatchingKeyword(keywords, input)
+            print(similarity, matchedWord, '\n')
+            if similarity > 0.5:
+                break
+   # print(keywords.index(matchedWord), '\n')
+    return keywords.index(matchedWord)
+
+#call this function:
+speechRecog()
 
 
 
